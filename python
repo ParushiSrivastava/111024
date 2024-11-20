@@ -1,0 +1,67 @@
+import requests
+
+# OMDb API Key (Replace 'your_api_key' with your actual API key)
+API_KEY = "your_api_key"
+
+# Function to fetch movie data from OMDb API
+def get_movie_data(movie_title):
+    url = f"http://www.omdbapi.com/?t={movie_title}&apikey={API_KEY}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        if data.get("Response") == "True":
+            return {
+                "title": data["Title"],
+                "year": data["Year"],
+                "genre": data["Genre"],
+                "ratings": {rating["Source"]: rating["Value"] for rating in data.get("Ratings", [])},
+                "plot": data["Plot"],
+                "director": data["Director"],
+                "actors": data["Actors"]
+            }
+        else:
+            print("Movie not found!")
+            return None
+    else:
+        print("Failed to fetch data from the API.")
+        return None
+
+# Function to display movie details
+def display_movie(movie):
+    print(f"\nTitle: {movie['title']}")
+    print(f"Year: {movie['year']}")
+    print(f"Genre: {movie['genre']}")
+    print(f"Director: {movie['director']}")
+    print(f"Actors: {movie['actors']}")
+    print(f"Plot: {movie['plot']}")
+    print("\nRatings:")
+    for source, rating in movie["ratings"].items():
+        print(f"  {source}: {rating}")
+    print("-" * 40)
+
+# Main Menu Function
+def main():
+    print("=== Movie Ratings Aggregator ===")
+    while True:
+        print("\nMenu:")
+        print("1. Search for a movie")
+        print("2. Exit")
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            movie_name = input("\nEnter the movie title: ").strip()
+            if movie_name:
+                movie = get_movie_data(movie_name)
+                if movie:
+                    display_movie(movie)
+            else:
+                print("Movie title cannot be empty!")
+        elif choice == "2":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the program
+if __name__ == "_main_":
+    main()
